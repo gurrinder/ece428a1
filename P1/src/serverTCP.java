@@ -21,6 +21,7 @@ class serverTCP
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
 		}
 
 		Socket connectionSocket = welcomeSocket.accept();
@@ -30,8 +31,10 @@ class serverTCP
 				.getOutputStream());
 
 		clientRequest = inFromClient.readLine();
-		while (!(clientString = inFromClient.readLine()).equals(""))
+		while ((clientString = inFromClient.readLine()) != null)
 		{
+			if (clientString.trim().equals(""))
+				break;
 			String[] clientSplit = clientString.split(" ");
 			if (clientSplit[1].equals(clientRequest))
 				team.add(clientSplit[0]);
