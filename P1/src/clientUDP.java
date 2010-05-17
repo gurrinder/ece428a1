@@ -32,6 +32,7 @@ public class clientUDP
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
 		}
 
 		file = null;
@@ -43,6 +44,7 @@ public class clientUDP
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
 		}
 		
 		ArrayList<String> lines = new ArrayList<String>();

@@ -22,6 +22,7 @@ class serverUDP
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
 		}
 
 		HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret = clientUDP
