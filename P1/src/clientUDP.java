@@ -10,11 +10,10 @@ public class clientUDP
 	{
 
 		DatagramSocket echoSocket = null;
-		String server = "localhost";
 		BufferedReader file = null;
 
 		echoSocket = new DatagramSocket();
-		InetAddress IPAddress = InetAddress.getByName(server);
+		InetAddress IPAddress = InetAddress.getLocalHost();
 		int port = -1;
 		File portFile = null;
 		while (true)
