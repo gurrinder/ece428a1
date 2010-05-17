@@ -45,7 +45,7 @@ class serverUDP
 		for (String line : lines)
 		{
 			String[] split = line.split(" ");
-			if (split.length != 1 && split[1].equals(teamRequest))
+			if (split.length != 1 && split[1].equalsIgnoreCase(teamRequest))
 				team.add(split[0]);
 		}
 

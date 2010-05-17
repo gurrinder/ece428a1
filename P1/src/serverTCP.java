@@ -33,10 +33,10 @@ class serverTCP
 		clientRequest = inFromClient.readLine();
 		while ((clientString = inFromClient.readLine()) != null)
 		{
-			if (clientString.trim().equals(""))
+			if (clientString.trim().equalsIgnoreCase(""))
 				break;
 			String[] clientSplit = clientString.split(" ");
-			if (clientSplit[1].equals(clientRequest))
+			if (clientSplit[1].equalsIgnoreCase(clientRequest))
 				team.add(clientSplit[0]);
 		}
 		for (int i = 0; i < team.size(); i++)
