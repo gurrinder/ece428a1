@@ -1,8 +1,8 @@
 all:
-	javac serverTCP.java
-	javac clientTCP.java
-	javac serverUDP.java
-	javac clientUDP.java
+	javac -g 1.6 serverTCP.java
+	javac -g 1.6 clientTCP.java
+	javac -g 1.6 serverUDP.java
+	javac -g 1.6 clientUDP.java
 	
 runTCP:
 	java serverTCP & 
