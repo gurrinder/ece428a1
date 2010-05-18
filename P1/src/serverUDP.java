@@ -50,8 +50,10 @@ class serverUDP
 		for (String line : lines)
 		{
 			String[] split = line.split(" ");
-			if (split.length != 1 && split[1].equalsIgnoreCase(teamRequest))
+			if (split.length >= 2 && split[1].equalsIgnoreCase(teamRequest))
+			{
 				team.add(split[0]);
+			}
 		}
 
 		byte[] size = { 0, 0, 0, 0 };
@@ -95,27 +97,42 @@ class serverUDP
 		{
 			byte[] justGot = new byte[1024];
 			DatagramPacket dpr = new DatagramPacket(justGot, justGot.length);
-			socket.receive(dpr);
+			try
+			{
+				socket.setSoTimeout(30000); //timeout in 30 seconds
+				socket.receive(dpr);
+			}
+			catch(SocketException se)
+			{
+				se.printStackTrace();
+				System.exit(0);
+			}
+			catch(SocketTimeoutException ste)
+			{
+				// a timeout occurred
+				break;
+			}
+			
 			int lineSize = 0;
-			lineSize += justGot[0];
-			lineSize = lineSize << 8;
-			lineSize += justGot[1];
-			lineSize = lineSize << 8;
-			lineSize += justGot[2];
-			lineSize = lineSize << 8;
-			lineSize += justGot[3];
+			lineSize += ((justGot[3]) & (0x000000FF));
+			lineSize += ((justGot[2] << 8) & (0x0000FF00));
+			lineSize += ((justGot[1] << 16) & (0x00FF0000));
+			lineSize += ((justGot[0] << 24) & (0xFF000000));
+						
 			bstr = new String(dpr.getData()).substring(4, lineSize + 4);
 			if (size == -1 && justGot[4] == '*')
 			{
 				size = 0;
-				size += justGot[8];
-				size += justGot[7] << 8;
-				size += justGot[6] << 16;
-				size += justGot[5] << 24;
+				size += ((justGot[8]) & (0x000000FF));
+				size += ((justGot[7] << 8) & (0x0000FF00));
+				size += ((justGot[6] << 16) & (0x00FF0000));
+				size += ((justGot[5] << 24) & (0xFF000000));
 				ip = dpr.getAddress();
 				port = dpr.getPort();
 			} else
+			{
 				lines.add(bstr);
+			}
 
 			if (size != -1 && lines.size() >= size)
 				break;

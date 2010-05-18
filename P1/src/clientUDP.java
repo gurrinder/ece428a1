@@ -79,12 +79,13 @@ public class clientUDP
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
-			System.exit(0);
+			System.exit(1);
 		}
 
 		for (String members : team)
 		{
-			file2.write(members + "\n");
+			file2.write(members);
+			file2.newLine();
 		}
 		file2.close();
 
@@ -118,26 +119,36 @@ public class clientUDP
 		{
 			byte[] justGot = new byte[1024];
 			DatagramPacket dpr = new DatagramPacket(justGot, justGot.length);
-			socket.receive(dpr);
+			try
+			{
+				socket.setSoTimeout(30000); //timeout in 30 seconds
+				socket.receive(dpr);
+			}
+			catch(SocketException se)
+			{
+				se.printStackTrace();
+				System.exit(0);
+			}
+			catch(SocketTimeoutException ste)
+			{
+				// a timeout occurred
+				break;
+			}
+			
 			int lineSize = 0;
-			lineSize += justGot[0];
-			lineSize = lineSize << 8;
-			lineSize += justGot[1];
-			lineSize = lineSize << 8;
-			lineSize += justGot[2];
-			lineSize = lineSize << 8;
-			lineSize += justGot[3];
+			lineSize += ((justGot[3]) & (0x000000FF));
+			lineSize += ((justGot[2] << 8) & (0x0000FF00));
+			lineSize += ((justGot[1] << 16) & (0x00FF0000));
+			lineSize += ((justGot[0] << 24) & (0xFF000000));
+			
 			bstr = new String(dpr.getData()).substring(4, lineSize + 4);
 			if (size == -1 && justGot[4] == '*')
 			{
 				size = 0;
-				size += justGot[5];
-				size = size << 8;
-				size += justGot[6];
-				size = size << 8;
-				size += justGot[7];
-				size = size << 8;
-				size += justGot[8];
+				size += ((justGot[8]) & (0x000000FF));
+				size += ((justGot[7] << 8) & (0x0000FF00));
+				size += ((justGot[6] << 16) & (0x00FF0000));
+				size += ((justGot[5] << 24) & (0xFF000000));
 				ip = dpr.getAddress();
 				port = dpr.getPort();
 			} else
