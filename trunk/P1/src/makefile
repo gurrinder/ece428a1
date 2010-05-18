@@ -14,3 +14,4 @@ runUDP:
 
 clean:
 	rm -rf *.class
+	rm -rf *.port
