@@ -1,28 +1,16 @@
-JFLAGS = -g -1.6
-JC = javac
-.SUFFIXES: .java .class
-.java.class:
-	$(JC) $(JFLAGS) $*.java
+all:
+	javac serverTCP.java
+	javac clientTCP.java
+	javac serverUDP.java
+	javac clientUDP.java
+	
+runTCP:
+	java serverTCP & 
+	java clientTCP in.dat Brazil
 
-TCPCLASSES = \
-	serverTCP.java \
-	clientTCP.java
-        
-runTCP: tcpclasses
-	java serverTCP & java clientTCP in.dat Brazil
-
-tcpclasses: $(TCPCLASSES:.java=.class)
-
-UDPCLASSES = \
-	serverUDP.java \
-	clientUDP.java
-        
-runUDP: udpclasses
-	java serverUDP & java clientUDP in.dat Brazil
-
-udpclasses: $(UDPCLASSES:.java=.class)
-
-
+runUDP:
+	java serverUDP & 
+	java clientUDP in.dat Brazil
 
 clean:
-	$(RM) *.class
+	rm -rf *.class
