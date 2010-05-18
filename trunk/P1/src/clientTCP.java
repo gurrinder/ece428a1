@@ -82,7 +82,8 @@ public class clientTCP
 
 		while ((line = in.readLine()) != null)
 		{
-			file2.write(line + "\n");
+			file2.write(line);
+			file2.newLine();
 		}
 		file2.close();
 
