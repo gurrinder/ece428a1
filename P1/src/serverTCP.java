@@ -14,6 +14,10 @@ class serverTCP
 		welcomeSocket.bind(null);
 		try
 		{
+			File portFile = new File("ServerTCP.port");
+			portFile.delete();
+			portFile = null;
+
 			BufferedWriter file = new BufferedWriter(new FileWriter(
 					"ServerTCP.port"));
 			file.write("" + welcomeSocket.getLocalPort() + "\n");
