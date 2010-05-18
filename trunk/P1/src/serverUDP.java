@@ -1,5 +1,6 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
@@ -16,6 +17,10 @@ class serverUDP
 		String teamRequest = "";
 		try
 		{
+			File portFile = new File("ServerUDP.port");
+			portFile.delete();
+			portFile = null;
+			
 			BufferedWriter file = new BufferedWriter(new FileWriter(
 					"ServerUDP.port"));
 			file.write("" + welcomeSocket.getLocalPort() + "\n");
@@ -103,13 +108,10 @@ class serverUDP
 			if (size == -1 && justGot[4] == '*')
 			{
 				size = 0;
-				size += justGot[5];
-				size = size << 8;
-				size += justGot[6];
-				size = size << 8;
-				size += justGot[7];
-				size = size << 8;
 				size += justGot[8];
+				size += justGot[7] << 8;
+				size += justGot[6] << 16;
+				size += justGot[5] << 24;
 				ip = dpr.getAddress();
 				port = dpr.getPort();
 			} else
