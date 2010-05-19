@@ -12,6 +12,7 @@ class serverUDP
 	{
 		ArrayList<String> team = new ArrayList<String>();
 		DatagramSocket welcomeSocket = new DatagramSocket();
+		welcomeSocket.setReceiveBufferSize(64*1024*1024); // 64MB
 		InetAddress ip = null;
 		Integer port = -1;
 		String teamRequest = "";
@@ -63,9 +64,12 @@ class serverUDP
 		size[0] = (byte) (team.size() >> 24);
 
 		UDPSend("*" + new String(size), ip, port, welcomeSocket);
+		Thread.sleep(100);
+		
 		for (String line : team)
 		{
 			UDPSend(line, ip, port, welcomeSocket);
+			Thread.sleep(10);
 		}
 
 	}
@@ -99,7 +103,7 @@ class serverUDP
 			DatagramPacket dpr = new DatagramPacket(justGot, justGot.length);
 			try
 			{
-				socket.setSoTimeout(30000); //timeout in 30 seconds
+//				socket.setSoTimeout(30000); //timeout in 30 seconds
 				socket.receive(dpr);
 			}
 			catch(SocketException se)
@@ -132,6 +136,7 @@ class serverUDP
 			} else
 			{
 				lines.add(bstr);
+				System.out.println("client will send:" + size + "\nWe have received :" + lines.size());
 			}
 
 			if (size != -1 && lines.size() >= size)

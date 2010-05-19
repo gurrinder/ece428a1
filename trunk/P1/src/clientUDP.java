@@ -13,6 +13,7 @@ public class clientUDP
 		BufferedReader file = null;
 
 		echoSocket = new DatagramSocket();
+		echoSocket.setReceiveBufferSize(64*1024*1024); // 64MB
 		InetAddress IPAddress = InetAddress.getLocalHost();
 		int port = -1;
 		File portFile = null;
@@ -61,10 +62,12 @@ public class clientUDP
 		size[0] = (byte) (sz >> 24);
 
 		UDPSend("*" + new String(size), IPAddress, port, echoSocket);
-
+		Thread.sleep(10);
+		
 		for (int i = 0; i < lines.size(); i++)
 		{
 			UDPSend(lines.get(i), IPAddress, port, echoSocket);
+			Thread.sleep(10);
 		}
 
 		HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret = UDPRecieveAll(echoSocket);
@@ -82,10 +85,13 @@ public class clientUDP
 			System.exit(1);
 		}
 
-		for (String members : team)
+		for (int i = 0; i < team.size(); i++)
 		{
-			file2.write(members);
-			file2.newLine();
+			file2.write(team.get(i));
+			if(i < team.size() - 1)
+			{
+				file2.newLine();
+			}
 		}
 		file2.close();
 
@@ -121,7 +127,7 @@ public class clientUDP
 			DatagramPacket dpr = new DatagramPacket(justGot, justGot.length);
 			try
 			{
-				socket.setSoTimeout(30000); //timeout in 30 seconds
+//				socket.setSoTimeout(30000); //timeout in 30 seconds
 				socket.receive(dpr);
 			}
 			catch(SocketException se)
@@ -152,7 +158,9 @@ public class clientUDP
 				ip = dpr.getAddress();
 				port = dpr.getPort();
 			} else
+			{
 				lines.add(bstr);
+			}
 
 			if (size != -1 && lines.size() >= size)
 				break;
