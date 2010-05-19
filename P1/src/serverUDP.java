@@ -64,7 +64,7 @@ class serverUDP
 		size[0] = (byte) (team.size() >> 24);
 
 		UDPSend("*" + new String(size), ip, port, welcomeSocket);
-		Thread.sleep(100);
+		Thread.sleep(10);
 		
 		for (String line : team)
 		{
@@ -103,18 +103,12 @@ class serverUDP
 			DatagramPacket dpr = new DatagramPacket(justGot, justGot.length);
 			try
 			{
-//				socket.setSoTimeout(30000); //timeout in 30 seconds
 				socket.receive(dpr);
 			}
-			catch(SocketException se)
+			catch(IOException e)
 			{
-				se.printStackTrace();
+				e.printStackTrace();
 				System.exit(0);
-			}
-			catch(SocketTimeoutException ste)
-			{
-				// a timeout occurred
-				break;
 			}
 			
 			int lineSize = 0;
@@ -136,7 +130,6 @@ class serverUDP
 			} else
 			{
 				lines.add(bstr);
-				System.out.println("client will send:" + size + "\nWe have received :" + lines.size());
 			}
 
 			if (size != -1 && lines.size() >= size)

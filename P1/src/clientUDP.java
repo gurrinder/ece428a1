@@ -127,18 +127,12 @@ public class clientUDP
 			DatagramPacket dpr = new DatagramPacket(justGot, justGot.length);
 			try
 			{
-//				socket.setSoTimeout(30000); //timeout in 30 seconds
 				socket.receive(dpr);
 			}
-			catch(SocketException se)
+			catch(IOException e)
 			{
-				se.printStackTrace();
+				e.printStackTrace();
 				System.exit(0);
-			}
-			catch(SocketTimeoutException ste)
-			{
-				// a timeout occurred
-				break;
 			}
 			
 			int lineSize = 0;
