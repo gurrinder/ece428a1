@@ -67,7 +67,7 @@ public class clientUDP
 		for (int i = 0; i < lines.size(); i++)
 		{
 			UDPSend(lines.get(i), IPAddress, port, echoSocket);
-			Thread.sleep(10);
+			Thread.sleep(1);
 		}
 
 		HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret = UDPRecieveAll(echoSocket);

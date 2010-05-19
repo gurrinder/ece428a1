@@ -79,11 +79,17 @@ public class clientTCP
 			System.err.println("Error: " + e.getMessage());
 			System.exit(1);
 		}
-
+		
+		boolean newline = false;
+		
 		while ((line = in.readLine()) != null)
 		{
+			if(newline)
+			{
+				file2.newLine();
+			}
 			file2.write(line);
-			file2.newLine();
+			newline = true;
 		}
 		file2.close();
 

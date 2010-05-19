@@ -69,7 +69,7 @@ class serverUDP
 		for (String line : team)
 		{
 			UDPSend(line, ip, port, welcomeSocket);
-			Thread.sleep(10);
+			Thread.sleep(1);
 		}
 
 	}
