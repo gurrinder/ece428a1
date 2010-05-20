@@ -13,7 +13,7 @@ public class clientUDP
 		BufferedReader file = null;
 
 		echoSocket = new DatagramSocket();
-		echoSocket.setReceiveBufferSize(64*1024*1024); // 64MB
+		echoSocket.setReceiveBufferSize(1024*1024); // 1MB
 		InetAddress IPAddress = InetAddress.getLocalHost();
 		int port = -1;
 		File portFile = null;
@@ -54,20 +54,22 @@ public class clientUDP
 			lines.add(line);
 		file.close();
 
-		byte[] size = { 0, 0, 0, 0 };
+		byte[] size = {0, 0, 0, 0, 0};
 		int sz = lines.size();
-		size[3] = (byte) (sz);
-		size[2] = (byte) (sz >> 8);
-		size[1] = (byte) (sz >> 16);
-		size[0] = (byte) (sz >> 24);
+		size[4] = (byte) ((sz) & 0x000000FF);
+		size[3] = (byte) ((sz >> 8) & 0x000000FF);
+		size[2] = (byte) ((sz >> 16) & 0x000000FF);
+		size[1] = (byte) ((sz >> 24) & 0x000000FF);
+		size[0] = (byte) ('*');
 
-		UDPSend("*" + new String(size), IPAddress, port, echoSocket);
+		
+		UDPSend(size, IPAddress, port, echoSocket);
 		Thread.sleep(10);
 		
 		for (int i = 0; i < lines.size(); i++)
 		{
-			UDPSend(lines.get(i), IPAddress, port, echoSocket);
-			Thread.sleep(1);
+			UDPSend(lines.get(i).getBytes(), IPAddress, port, echoSocket);
+			Thread.sleep(10);
 		}
 
 		HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret = UDPRecieveAll(echoSocket);
@@ -98,19 +100,23 @@ public class clientUDP
 		echoSocket.close();
 	}
 
-	static void UDPSend(String line, InetAddress add, int port,
+	static void UDPSend(byte[] byteArray, InetAddress add, int port,
 			DatagramSocket socket) throws IOException
 	{
-		int size = line.length();
-		byte[] bstr = ("    " + line).getBytes();
+		int size = byteArray.length;
+		byte[] bstr = new byte[4 + size];
 		bstr[3] = (byte) (size);
 		bstr[2] = (byte) (size >> 8);
 		bstr[1] = (byte) (size >> 16);
 		bstr[0] = (byte) (size >> 24);
 
+		for(int i = 4; i < bstr.length; i++)
+		{
+			bstr[i] = byteArray[i-4];
+		}
+		
 		DatagramPacket dp = new DatagramPacket(bstr, bstr.length, add, port);
 		socket.send(dp);
-
 	}
 
 	static HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> UDPRecieveAll(
@@ -154,6 +160,8 @@ public class clientUDP
 			} else
 			{
 				lines.add(bstr);
+				System.out.println("client expected:" + size + "server got:" + lines.size());
+
 			}
 
 			if (size != -1 && lines.size() >= size)
