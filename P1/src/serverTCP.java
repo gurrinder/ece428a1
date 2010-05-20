@@ -43,6 +43,8 @@ class serverTCP
 			if (clientSplit[1].equalsIgnoreCase(clientRequest))
 				team.add(clientSplit[0]);
 		}
+		if (team.size() == 0)
+			team.add(clientRequest + " did not qualify to the world cup");
 		for (int i = 0; i < team.size(); i++)
 		{
 			outToClient.writeBytes(team.get(i) + "\n");

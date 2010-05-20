@@ -56,7 +56,8 @@ class serverUDP
 				team.add(split[0]);
 			}
 		}
-
+		if (team.size() == 0)
+			team.add(teamRequest + " did not qualify to the world cup");
 		byte[] size = { 0, 0, 0, 0 };
 		size[3] = (byte) (team.size());
 		size[2] = (byte) (team.size() >> 8);
