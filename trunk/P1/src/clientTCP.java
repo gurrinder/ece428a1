@@ -10,7 +10,7 @@ public class clientTCP
 		Socket echoSocket = null;			// socket for sending to server
 		PrintWriter out = null;				// writer for writing to server
 		BufferedReader in = null;			// reader for reading from server
-		BufferedReader file = null;			// reader for reading data file
+		BufferedReader file = null;			// reader for reading roster file
 		int port = -1;
 		
 		try {
