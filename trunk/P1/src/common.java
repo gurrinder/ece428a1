@@ -15,6 +15,7 @@ import java.util.HashMap;
  */
 public class common {
 	
+	// writes port number to a file to be used by client to determine server's port
 	static void setPort(final int port, final String fileName) throws IOException
 	{
 	
@@ -26,6 +27,7 @@ public class common {
 		file.close();
 	}
 	
+	// reads port number used by server from a file
 	static int getPort(final String fileName) throws Exception
 	{
 		int port = -1;
