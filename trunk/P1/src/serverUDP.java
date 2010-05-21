@@ -47,6 +47,7 @@ class serverUDP
 			}
 		}
 		
+		// check if requested team exists in the world cup roster
 		if (teamRequest == null) {
 			System.err.println("requested team cannot be found");
 			System.exit(1);
