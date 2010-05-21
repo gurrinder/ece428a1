@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /* This class contains utility code common to server and client code such as setting
- * setting up port file and perfoming send and receive operations of UDP packets
+ * setting up port file and performing send and receive operations of UDP packets
  */
 public class common {
 	
