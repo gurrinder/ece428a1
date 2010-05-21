@@ -7,29 +7,16 @@ public class clientTCP
 			InterruptedException
 	{
 
-		Socket echoSocket = null;
-		PrintWriter out = null;
-		BufferedReader in = null;
-		BufferedReader file = null;
+		Socket echoSocket = null;			// socket for sending to server
+		PrintWriter out = null;				// writer for writing to server
+		BufferedReader in = null;			// reader for reading from server
+		BufferedReader file = null;			// reader for reading data file
 		int port = -1;
-		File portFile = null;
-		while (true)
-		{
-			Thread.sleep(500);
-			portFile = new File("ServerTCP.port");
-			if (portFile.exists())
-				break;
-		}
-
-		try
-		{
-			file = new BufferedReader(new FileReader("ServerTCP.port"));
-			port = Integer.valueOf(file.readLine());
-			file.close();
-		} catch (Exception e)
-		{
-			System.err.println("Error: " + e.getMessage());
-			System.exit(1);
+		
+		try {
+			port = common.getPort("ServerTCP.port");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		file = null;

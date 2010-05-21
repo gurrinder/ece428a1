@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 class serverTCP
 {
+	static final String PORT_FILE = "ServerTCP.port";
+	
 	public static void main(String argv[]) throws Exception
 	{
 		String clientString;
@@ -12,16 +14,11 @@ class serverTCP
 
 		ServerSocket welcomeSocket = new ServerSocket();
 		welcomeSocket.bind(null);
+		int port = welcomeSocket.getLocalPort();
+		
 		try
 		{
-			File portFile = new File("ServerTCP.port");
-			portFile.delete();
-			portFile = null;
-
-			BufferedWriter file = new BufferedWriter(new FileWriter(
-					"ServerTCP.port"));
-			file.write("" + welcomeSocket.getLocalPort() + "\n");
-			file.close();
+			common.setPort(port, PORT_FILE);
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
