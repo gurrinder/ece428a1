@@ -10,18 +10,9 @@ public class clientUDP
 	
 	public static void main(String[] args)
 	{
-		int port = 0;
-		DatagramSocket echoSocket = null;
-		BufferedReader dataFileReader  = null;
-		InetAddress localIP = null;
-		String readContent = null;
-		ArrayList<String> contentList = new ArrayList<String>();
-		HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret;
-		BufferedWriter file2 = null;
-		ArrayList<String> teamList = null;
 		
-		// we need to find the file with the port number
-		// otherwise we cannot proceed
+		// get port for connecting to server
+		int port = 0;
 		try
 		{
 			port = common.getPort(PORT_FILE);
@@ -31,6 +22,9 @@ public class clientUDP
 			System.exit(1);
 		}
 
+		// set up socket for communicating with server
+		DatagramSocket echoSocket = null;
+		InetAddress localIP = null;
 		try 
 		{
 			echoSocket = new DatagramSocket();
@@ -39,58 +33,52 @@ public class clientUDP
 			// used for getting the local IP address of the host
 			localIP = InetAddress.getLocalHost();
 		} 
-		catch (SocketException se) 
-		{
-			se.printStackTrace();
-			System.exit(1);
-		}
-		catch (UnknownHostException e) 
+		catch (Exception e) 
 		{
 			e.printStackTrace();
 			System.exit(1);
-		}
-
+		}		
 		
+		ArrayList<String> data = new ArrayList<String>();	// store roster data
 		
+		// read world cup roster from file
+		BufferedReader dataFileReader  = null;
 		try 
 		{
 			dataFileReader = new BufferedReader(new FileReader(args[0]));
 			// add the country as the first entry in the list
-			contentList.add(args[1]);
+			data.add(args[1]);
+			String readContent = null;
 			while ((readContent = dataFileReader.readLine()) != null)
 			{
-				contentList.add(readContent);
+				data.add(readContent);
 			}
 			dataFileReader.close();
 			dataFileReader = null;
 		} 
-		catch (FileNotFoundException e1) 
-		{
-			e1.printStackTrace();
-			System.exit(1);
-		} 
-		catch (IOException e) 
+		catch (Exception e) 
 		{
 			e.printStackTrace();
 			System.exit(1);
 		}
 				
-		// split the size of contentList into 1 byte blocks 
+		// encode number of lines to be sent to server 
 		byte[] size = {0,0,0,0,0};
-		size[4] = (byte) ((contentList.size()) & 0x000000FF);
-		size[3] = (byte) ((contentList.size() >> 8) & 0x000000FF);
-		size[2] = (byte) ((contentList.size() >> 16) & 0x000000FF);
-		size[1] = (byte) ((contentList.size() >> 24) & 0x000000FF);
+		size[4] = (byte) ((data.size()) & 0x000000FF);
+		size[3] = (byte) ((data.size() >> 8) & 0x000000FF);
+		size[2] = (byte) ((data.size() >> 16) & 0x000000FF);
+		size[1] = (byte) ((data.size() >> 24) & 0x000000FF);
 		// this is a special-magic character indicating that the following
-		// bytes are the size of the contentList
+		// bytes are the size of the data
 		size[0] = (byte) ('*');
 
+		// send roster data to server
 		try
 		{
 			// the first thing we send is how many packets should be expected
 			// in future
 			common.UDPSend(size, localIP, port, echoSocket);
-			for (int i = 0; i < contentList.size(); i++) 
+			for (int i = 0; i < data.size(); i++) 
 			{
 				try 
 				{
@@ -101,7 +89,7 @@ public class clientUDP
 				{
 					e.printStackTrace();
 				}
-				common.UDPSend(contentList.get(i).getBytes(), localIP, port, echoSocket);
+				common.UDPSend(data.get(i).getBytes(), localIP, port, echoSocket);
 			}
 		}
 		catch (IOException e) 
@@ -110,12 +98,14 @@ public class clientUDP
 			System.exit(1);
 		}
 		
+		// get list of players from specified country from the server
+		ArrayList<String> players = null;
 		try 
 		{			
-			// we receive all the team members for the specified country from the server
-			ret = common.UDPRecieveAll(echoSocket);
+			HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret = 
+				common.UDPRecieveAll(echoSocket);
 			HashMap<Integer, ArrayList<String>> ret2 = ret.get(ret.keySet().iterator().next());
-			teamList = ret2.get(ret2.keySet().iterator().next());
+			players = ret2.get(ret2.keySet().iterator().next());
 		} 
 		catch (IOException e) 
 		{
@@ -123,9 +113,11 @@ public class clientUDP
 			System.exit(1);
 		}
 		
+		// set up output file for requested team's player names
+		BufferedWriter outWriter = null;
 		try 
 		{
-			file2 = new BufferedWriter(new FileWriter(OUTPUT_FILE));
+			outWriter = new BufferedWriter(new FileWriter(OUTPUT_FILE));
 		}
 		catch (Exception e) 
 		{
@@ -133,22 +125,24 @@ public class clientUDP
 			System.exit(1);
 		}
 
+		// write players in the requested team to the output file
 		try 
 		{
-			for (int i = 0; i < teamList.size(); i++) 
+			for (int i = 0; i < players.size(); i++) 
 			{
-					file2.write(teamList.get(i));
-					if (i < teamList.size() - 1) 
+					outWriter.write(players.get(i));
+					if (i < players.size() - 1) 
 					{
-						file2.newLine();
+						outWriter.newLine();
 					}
 			}
-			file2.close();
+			outWriter.close();
 		}
 		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
+		
 		echoSocket.close();
 	}
 }
