@@ -40,6 +40,7 @@ public class clientTCP
 			System.exit(1);
 		}
 
+		// open file containing world cup roster
 		try
 		{
 			file = new BufferedReader(new FileReader(args[0]));
