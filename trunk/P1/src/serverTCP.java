@@ -9,13 +9,15 @@ class serverTCP
 	public static void main(String argv[]) throws Exception
 	{
 		String clientString;
-		String clientRequest;
+		String clientRequest;		// stores requests coming in from client
 		ArrayList<String> team = new ArrayList<String>();
 
+		// open a socket and bind to a random open port
 		ServerSocket welcomeSocket = new ServerSocket();
 		welcomeSocket.bind(null);
 		int port = welcomeSocket.getLocalPort();
 		
+		// write port used to a file which will be read by the client
 		try
 		{
 			common.setPort(port, PORT_FILE);
@@ -25,6 +27,7 @@ class serverTCP
 			System.exit(1);
 		}
 
+		// listen for connection from client and set up communication
 		Socket connectionSocket = welcomeSocket.accept();
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(
 				connectionSocket.getInputStream()));
