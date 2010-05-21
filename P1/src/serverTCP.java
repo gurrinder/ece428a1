@@ -8,10 +8,6 @@ class serverTCP
 	
 	public static void main(String argv[]) throws Exception
 	{
-		String clientString;
-		String clientRequest;		// stores requests coming in from client
-		ArrayList<String> team = new ArrayList<String>();
-
 		// open a socket and bind to a random open port
 		ServerSocket welcomeSocket = new ServerSocket();
 		welcomeSocket.bind(null);
@@ -34,22 +30,36 @@ class serverTCP
 		DataOutputStream outToClient = new DataOutputStream(connectionSocket
 				.getOutputStream());
 
-		clientRequest = inFromClient.readLine();
-		while ((clientString = inFromClient.readLine()) != null)
+		String teamRequested = inFromClient.readLine();		// team requested by client
+		ArrayList<String> team = new ArrayList<String>();	// players in requested team
+		
+		// read world cup roster from client
+		String curPlayer;
+		while ((curPlayer = inFromClient.readLine()) != null)
 		{
-			if (clientString.trim().equalsIgnoreCase(""))
+			// check for end of transmission
+			if (curPlayer.trim().equalsIgnoreCase(""))
 				break;
-			String[] clientSplit = clientString.split(" ");
-			if (clientSplit[1].equalsIgnoreCase(clientRequest))
-				team.add(clientSplit[0]);
+			
+			String[] tokens = curPlayer.split(" ");
+			if (tokens[1].equalsIgnoreCase(teamRequested))
+				team.add(tokens[0]);
 		}
+		
+		// check if requested team qualified for the world cup
 		if (team.size() == 0)
-			team.add(clientRequest + " did not qualify to the world cup");
+			team.add(teamRequested + " did not qualify to the world cup");
+		
+		// send list of players in requested team to client
 		for (int i = 0; i < team.size(); i++)
 		{
 			outToClient.writeBytes(team.get(i) + "\n");
 		}
+		
+		// close connections
 		inFromClient.close();
 		outToClient.close();
+		connectionSocket.close();
+		welcomeSocket.close();
 	}
 }
