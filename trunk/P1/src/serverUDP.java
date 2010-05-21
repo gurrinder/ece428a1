@@ -1,7 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.File;
-import java.net.*;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,16 +15,11 @@ class serverUDP
 		InetAddress ip = null;
 		Integer port = -1;
 		String teamRequest = "";
+		
+		int serverPort = welcomeSocket.getLocalPort();
 		try
 		{
-			// if an old file exists, delete it before creating a new one
-			File portFile = new File(PORT_FILE);
-			portFile.delete();
-			portFile = null;
-			
-			BufferedWriter file = new BufferedWriter(new FileWriter(PORT_FILE));
-			file.write("" + welcomeSocket.getLocalPort() + "\n");
-			file.close();
+			common.setPort(serverPort, PORT_FILE);
 		}
 		catch (Exception e)
 		{

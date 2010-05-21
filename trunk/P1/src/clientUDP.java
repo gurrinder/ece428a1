@@ -12,10 +12,8 @@ public class clientUDP
 	{
 		int port = 0;
 		DatagramSocket echoSocket = null;
-		BufferedReader portFileReader = null;
 		BufferedReader dataFileReader  = null;
 		InetAddress localIP = null;
-		File portFile = null;
 		String readContent = null;
 		ArrayList<String> contentList = new ArrayList<String>();
 		HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> ret;
@@ -24,23 +22,13 @@ public class clientUDP
 		
 		// we need to find the file with the port number
 		// otherwise we cannot proceed
-		while (true) 
+		try
 		{
-			portFile = new File(PORT_FILE);
-			if (portFile.exists())
-			{
-				portFile = null;
-				break;
-			}
-			try
-			{
-				Thread.sleep(500);
-			}
-			// non-fatal exception
-			catch(InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+			port = common.getPort(PORT_FILE);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 
 		try 
@@ -62,28 +50,7 @@ public class clientUDP
 			System.exit(1);
 		}
 
-		try
-		{
-			portFileReader = new BufferedReader(new FileReader(PORT_FILE));
-			port = Integer.valueOf(portFileReader.readLine());
-			portFileReader.close();
-			portFileReader = null;
-		} 
-		catch (FileNotFoundException e1) 
-		{
-			e1.printStackTrace();
-			System.exit(1);
-		} 
-		catch (NumberFormatException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-			System.exit(1);
-		}
+		
 		
 		try 
 		{
