@@ -1,7 +1,4 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -9,7 +6,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,21 +14,7 @@ public class serverTCP {
 
         ServerSocket serverSocket = new ServerSocket();
         serverSocket.bind(null);
-        try
-		{
-			File portFile = new File("serverTCP.port");
-			portFile.delete();
-			portFile = null;
-
-			BufferedWriter file = new BufferedWriter(new FileWriter(
-					"serverTCP.port"));
-			file.write("" + serverSocket.getLocalPort());
-			file.close();
-		} catch (Exception e)
-		{
-			System.err.println("Error: " + e.getMessage());
-			System.exit(1);
-		}
+        common.setPort(serverSocket.getLocalPort(), "serverTCP.port");
 
         Socket clientSocket = null;
         try {
@@ -64,10 +46,9 @@ public class serverTCP {
         	players = new ArrayList<String>();
         	players.add(team + " did not qualify to the world cup");
         } 
-    	Iterator<String> it = players.iterator();
-        while (it.hasNext()) {
-        	out.println(it.next());
-        }
+    	for (String player : players) {
+    		out.println(player);
+    	}
         out.println("@@@");
         
         out.close();

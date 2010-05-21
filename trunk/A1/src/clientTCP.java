@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,27 +15,10 @@ public class clientTCP {
     public static void main(String[] args) throws IOException {
 
     	int port = -1;
-		File portFile = null;
-		while (true)
-		{
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			portFile = new File("serverTCP.port");
-			if (portFile.exists())
-				break;
-		}
-    	
-		try
-		{
-			BufferedReader portReader = new BufferedReader(new FileReader(portFile));
-			port = Integer.valueOf(portReader.readLine());
-			portReader.close();
-		} catch (Exception e)
-		{
-			System.err.println("Error: " + e.getMessage());
+		try {
+			port = common.getPort("serverTCP.port");
+		} catch (Exception e) {
+			e.printStackTrace();
 			System.exit(1);
 		}
 		
