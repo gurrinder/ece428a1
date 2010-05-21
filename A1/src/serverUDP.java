@@ -1,6 +1,3 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,27 +10,11 @@ import java.util.Map;
 
 public class serverUDP {
     
-	
 	public static void main(String[] args) throws IOException {
 
         DatagramSocket socket = new DatagramSocket();
-        socket.setReceiveBufferSize(64*1024*1024); // 64MB
-        
-        try
-		{
-			File portFile = new File("serverUDP.port");
-			portFile.delete();
-			portFile = null;
-
-			BufferedWriter file = new BufferedWriter(new FileWriter(
-					"serverUDP.port"));
-			file.write("" + socket.getLocalPort());
-			file.close();
-		} catch (Exception e)
-		{
-			System.err.println("Error: " + e.getMessage());
-			System.exit(1);
-		}
+        socket.setReceiveBufferSize(1024*1024); // 1 MB
+        common.setPort(socket.getLocalPort(), "serverUDP.port");
 		
 		final int bufferSize = 1024;
         byte buffer[] = new byte[bufferSize];
@@ -74,16 +55,17 @@ public class serverUDP {
         	players = new ArrayList<String>();
         	players.add(team + " did not qualify to the world cup");
         }
-    	Iterator<String> it = players.iterator();
-    	//try {
-	    	while (it.hasNext()) {
-	        	buffer = it.next().getBytes();
+    	
+    	try {
+	    	for (String player : players) {
+	    		buffer = player.getBytes();
 	        	socket.send(new DatagramPacket(buffer, buffer.length, ip, clientPort));
-	        	//Thread.sleep(1);
-	        }
-//    	} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+	        	Thread.sleep(1);
+	    	}
+        	
+    	} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
         buffer = "@@@".getBytes();
         socket.send(new DatagramPacket(buffer, buffer.length, ip, clientPort));
         
