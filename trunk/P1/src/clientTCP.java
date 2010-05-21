@@ -22,6 +22,7 @@ public class clientTCP
 
 		file = null;
 
+		// set up communication to the server 
 		try
 		{
 			echoSocket = new Socket(InetAddress.getLocalHost(), port);
@@ -39,7 +40,6 @@ public class clientTCP
 			System.exit(1);
 		}
 
-		String line;
 		try
 		{
 			file = new BufferedReader(new FileReader(args[0]));
@@ -49,38 +49,42 @@ public class clientTCP
 			System.exit(1);
 		}
 
-		out.println(args[1]);
+		out.println(args[1]);	// send selected country to server
+		
+		// send list of data file contents to server
+		String line;
 		while ((line = file.readLine()) != null)
 		{
 			out.println(line);
 		}
 		file.close();
-		out.println("");
+		
+		out.println("");	// send empty string to indicate end of transmission
 
-		BufferedWriter file2 = null;
-
+		// open output file for writing
+		BufferedWriter outFile = null;
 		try
 		{
-			file2 = new BufferedWriter(new FileWriter("outTCP.dat"));
+			outFile = new BufferedWriter(new FileWriter("outTCP.dat"));
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
 			System.exit(1);
 		}
 		
+		// get players of selected country from server and write them to outFile 
 		boolean newline = false;
-		
 		while ((line = in.readLine()) != null)
 		{
 			if(newline)
 			{
-				file2.newLine();
+				outFile.newLine();
 			}
-			file2.write(line);
+			outFile.write(line);
 			newline = true;
 		}
-		file2.close();
-
+		
+		outFile.close();
 		out.close();
 		in.close();
 		echoSocket.close();
