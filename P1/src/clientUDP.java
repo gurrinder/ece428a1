@@ -107,6 +107,7 @@ public class clientUDP
 		catch (IOException e) 
 		{
 			e.printStackTrace();
+			System.exit(1);
 		}
 		
 		try 

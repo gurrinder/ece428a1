@@ -17,6 +17,7 @@ public class clientTCP
 			port = common.getPort("ServerTCP.port");
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		file = null;
