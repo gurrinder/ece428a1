@@ -15,23 +15,26 @@ import java.util.HashMap;
  */
 public class common {
 	
-	// writes port number to a file to be used by client to determine server's port
 	static void setPort(final int port, final String fileName) throws IOException
 	{
-	
+		// delete any old port file, since we dont want to append or overwrite it
 		File portFile = new File(fileName);
 		portFile.delete();
 
+		// write the new port into the specified file
 		BufferedWriter file = new BufferedWriter(new FileWriter(fileName));
 		file.write("" + port + "\n");
 		file.close();
 	}
 	
-	// reads port number used by server from a file
 	static int getPort(final String fileName) throws Exception
 	{
 		int port = -1;
 		File portFile = null;
+		
+		// we cannot exit until we find a file
+		// this loop continually searches for the provided file
+		// until it is created
 		while (true)
 		{
 			Thread.sleep(500);
@@ -40,6 +43,7 @@ public class common {
 				break;
 		}
 
+		// open the port file and read in the port number from it
 		BufferedReader reader = new BufferedReader(new FileReader(portFile));
 		port = Integer.valueOf(reader.readLine());
 		reader.close();
@@ -49,6 +53,11 @@ public class common {
 	
 	static void UDPSend(byte[] byteArray, InetAddress add, int port, DatagramSocket socket) throws IOException
 	{
+		// byteArray will be send over the wire
+		// the first four bytes of the packet will point
+		// to how many bytes to read i.e. the number of elements in byteArray
+		// so we get the size of the byteArray and then split it into
+		// 4 - single byte and then send it over from the socket
 		int size = byteArray.length;
 		byte[] bstr = new byte[4 + size];
 		bstr[3] = (byte) (size);
@@ -58,6 +67,7 @@ public class common {
 
 		for(int i = 4; i < bstr.length; i++)
 		{
+			// copy the content to send over into the bstr array
 			bstr[i] = byteArray[i-4];
 		}
 		
@@ -67,6 +77,7 @@ public class common {
 
 	static HashMap<InetAddress, HashMap<Integer, ArrayList<String>>> UDPRecieveAll(DatagramSocket socket) throws IOException
 	{
+		// lines store all the elements sent over the packet
 		ArrayList<String> lines = new ArrayList<String>();
 		String bstr = "";
 		int size = -1;
@@ -86,16 +97,22 @@ public class common {
 				e.printStackTrace();
 				System.exit(0);
 			}
-			
+
+			// lineSize is the number of bytes to read in the packet
 			int lineSize = 0;
 			lineSize += ((justGot[3]) & (0x000000FF));
 			lineSize += ((justGot[2] << 8) & (0x0000FF00));
 			lineSize += ((justGot[1] << 16) & (0x00FF0000));
 			lineSize += ((justGot[0] << 24) & (0xFF000000));
 			
+			// read the number of bytes in the packet and store it as string
 			bstr = new String(dpr.getData()).substring(4, lineSize + 4);
+
 			if (size == -1 && justGot[4] == '*')
 			{
+				// this is a special delimiter used for telling
+				// how many more packets will be sent, so the loop will continue
+				// on until we receive that many packets
 				size = 0;
 				size += ((justGot[8]) & (0x000000FF));
 				size += ((justGot[7] << 8) & (0x0000FF00));
@@ -106,13 +123,18 @@ public class common {
 			} 
 			else
 			{
+				// add the content read from the packet to the arraylist
+				// which stores string types
 				lines.add(bstr);
-				if(lines.size() % 100 == 0)
+/*				if(lines.size() % 100 == 0)
 				{
 					System.out.println("expected: " + size + " got: " + lines.size());
-				}
+				}*/
 			}
 			
+			// we only break the loop if the following conditions are met:
+			// a) we dont know how many packets to expect
+			// b) we know how many packets to expect and we get that many packets
 			if (size != -1 && lines.size() >= size)
 			{
 				break;
